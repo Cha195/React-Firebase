@@ -5,11 +5,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createStore, applyMiddleware, compose } from 'redux'
 import rootReducer from './store/reducer/rootReducer'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import thunk from 'redux-thunk'
 import firebase from './config/fbConfig';
 import { createFirestoreInstance, reduxFirestore, getFirestore } from 'redux-firestore'
-import { ReactReduxFirebaseProvider, getFirebase } from 'react-redux-firebase'
+import { ReactReduxFirebaseProvider, getFirebase, isLoaded } from 'react-redux-firebase'
 import 'firebase/firestore';
 
 const rrfConfig = { 
@@ -24,21 +24,32 @@ const store = createStore(rootReducer,
   )
 );
 
-const rffProps = {
+const rrfProps = {
   firebase,
-  useFirestoreForProfile: true,
   config: rrfConfig,
   dispatch: store.dispatch,
-  createFirestoreInstance
+  createFirestoreInstance,
+  userProfile: 'users', // where profiles are stored in database
+  presence: 'presence', // where list of online users is stored in database
+  sessions: 'sessions'
+}
+
+function AuthIsLoaded({ children }) {
+  const auth = useSelector(state => state.firebase.auth)
+  if (!isLoaded(auth)) return <div>Loading Screen...</div>;
+      return children
 }
 
 ReactDOM.render(
-  <Provider store={store}>
-      <ReactReduxFirebaseProvider {...rffProps}>
-          <App />  
-      </ReactReduxFirebaseProvider>
-  </Provider>, 
-document.getElementById('root'));
+  <Provider store={store}> 
+    <ReactReduxFirebaseProvider {...rrfProps}> 
+      <AuthIsLoaded>
+        <App /> 
+      </AuthIsLoaded>
+    </ReactReduxFirebaseProvider>
+  </Provider>
+  , document.getElementById('root')
+);
 
 
 // If you want to start measuring performance in your app, pass a function

@@ -17,6 +17,7 @@ class CreatePost extends Component {
     e.preventDefault();
     // console.log(this.state);
     this.props.createPost(this.state);
+    this.props.history.push('/');
   }
   render() {
     if(!this.props.auth.uid) return(<Redirect to="/signin"/>)
@@ -44,7 +45,8 @@ class CreatePost extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    auth: state.firebase.auth
+    auth: state.firebase.auth,
+    user: state.firebase.profile
   }
 }
 

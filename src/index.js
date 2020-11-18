@@ -13,7 +13,7 @@ import { ReactReduxFirebaseProvider, getFirebase, isLoaded } from 'react-redux-f
 import 'firebase/firestore';
 
 const rrfConfig = { 
-  userProfile: 'posts',
+  userProfile: 'users',
   useFirestoreForProfile: true
 }
 
@@ -37,7 +37,7 @@ const rrfProps = {
 function AuthIsLoaded({ children }) {
   const auth = useSelector(state => state.firebase.auth)
   if (!isLoaded(auth)) return <div>Loading Screen...</div>;
-      return children
+  return children
 }
 
 ReactDOM.render(

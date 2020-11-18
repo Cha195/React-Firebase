@@ -1,21 +1,55 @@
-import React from 'react'
+import React from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { firestoreConnect } from 'react-redux-firebase';
 
 const PostDetails = (props) => {
-  const id = props.match.params.id;
-  return (
-    <div className="container section post-details">
-      <div className="card z-depth-0">
-        <div className="card-content">
-          <span className="card-title">Post title - { id }</span>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Et labore quaerat quibusdam vel saepe, ab voluptate accusantium culpa nemo fuga earum? Soluta amet nobis officia sed neque fuga aperiam quia?</p>
-        </div>
-        <div className="card-action grey lighten-4 grey-text">
-          <div>Posted by The Net Ninja</div>
-          <div>2nd September, 2am</div>
+  const {post} = props;
+  console.log(post);
+  if(post) {
+    return (
+      <div className="container section post-details">
+        <div className="card z-depth-0">
+          <div className="card-content">
+            <span className="card-title">{post.title}</span>
+            <p>{post.content}</p>
+          </div>
+          <div className="card-action grey lighten-4 grey-text">
+            <div>Posted by {post.authorFirstName} {post.authorLastName}</div>
+            <div>{new Intl.DateTimeFormat("en-GB", {
+                  year: "numeric",
+                  month: "long",
+                  day: "2-digit",
+                  timeZone: 'Asia/Shanghai',
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: true
+                }).format(post.createdAt)}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
+  else {
+    return(
+      <div className="container center">
+        Loading Post...
+      </div>
+    )
+  }
 }
 
-export default PostDetails
+const mapStatetoProps = (state,myprops) => {
+  const id = myprops.match.params.id;
+  const posts = state.firestore.data.post;
+  const post = posts ? posts[id] : null
+  return({ post });
+}
+
+export default compose(
+  connect(mapStatetoProps),
+  firestoreConnect([
+    { collection: 'post' }
+  ])
+)(PostDetails);
